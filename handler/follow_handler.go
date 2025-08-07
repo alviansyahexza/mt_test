@@ -21,6 +21,7 @@ func (h *Handler) FollowUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 	follow.Id = f.Id
+	follow.FollowerId = f.FollowerId
 	follow.CreatedAt = f.CreatedAt
 	return c.Status(fiber.StatusCreated).JSON(follow)
 }

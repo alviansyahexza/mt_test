@@ -22,10 +22,12 @@ func (h *Handler) FindPosts(c *fiber.Ctx) error {
 	}
 	sortBy := c.Query("sort_by", "created_at")
 	sortOrder := c.Query("sort_order", "desc")
+	isFeed := c.Query("is_feed", "true") == "true"
 	if sortBy != "created_at" || (sortOrder != "asc" && sortOrder != "desc") {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid sort parameters"})
 	}
-	postList, err := h.postService.GetPosts(user_id, page, size, sortBy, sortOrder)
+
+	postList, err := h.postService.GetPosts(user_id, page, size, sortBy, sortOrder, isFeed)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
