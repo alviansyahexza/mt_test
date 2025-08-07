@@ -3,6 +3,8 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/alviansyahexza/mt_test/entity"
 )
@@ -52,6 +54,62 @@ func (s *PostService) GetPosts(user_id int, page int, size int, sortBy string, s
 		posts = append(posts, post)
 	}
 	return posts, nil
+}
+
+func (s *PostService) GetPostByIds(ids []string, sortBy string, sortOrder string) ([]entity.Post, error) {
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = id
+	}
+	query := fmt.Sprintf(`
+		SELECT id, title, content, user_id, created_at
+		FROM posts
+		WHERE id IN (%s)
+		ORDER BY %s %s
+	`, strings.Join(placeholders, ","), sortBy, sortOrder)
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []entity.Post
+	for rows.Next() {
+		var post entity.Post
+		if err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.UserId, &post.CreatedAt); err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
+}
+
+func (s *PostService) GetPostIds(userId int, size int, sortBy string, sortOrder string, isFeed bool) ([]int, error) {
+	var query string
+	if isFeed {
+		query = "SELECT id FROM posts WHERE user_id IN (SELECT followed_id FROM follows WHERE follower_id = $1) OR user_id = $1 ORDER BY " + sortBy + " " + sortOrder + " LIMIT $2"
+	} else {
+		query = "SELECT id FROM posts WHERE user_id = $1 ORDER BY " + sortBy + " " + sortOrder + " LIMIT $2"
+	}
+	rows, err := s.db.Query(query, userId, size)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var postsIds []int
+	for rows.Next() {
+		var post int
+		if err := rows.Scan(&post); err != nil {
+			return nil, err
+		}
+		postsIds = append(postsIds, post)
+	}
+
+	return postsIds, nil
 }
 
 func (s *PostService) GetPostById(id int) (*entity.Post, error) {
