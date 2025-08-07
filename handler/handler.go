@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/alviansyahexza/mt_test/config"
+	"github.com/alviansyahexza/mt_test/repo"
 	"github.com/alviansyahexza/mt_test/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -20,7 +21,7 @@ type Handler struct {
 
 func NewHandler(db *sql.DB, jwt *config.JWT) *Handler {
 	return &Handler{
-		userService:   service.NewUserService(db),
+		userService:   service.NewUserService(repo.NewUserRepo(db)),
 		postService:   service.NewPostService(db),
 		followService: service.NewFollowService(db),
 		jwt:           jwt,
