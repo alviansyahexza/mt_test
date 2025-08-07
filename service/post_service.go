@@ -29,10 +29,11 @@ func (s *PostService) CreatePost(title, content string, userId int) (*entity.Pos
 	return post, nil
 }
 
-func (s *PostService) GetPosts(user_id int) ([]entity.Post, error) {
+func (s *PostService) GetPosts(user_id int, page int, size int, sortBy string, sortOrder string) ([]entity.Post, error) {
 	posts := []entity.Post{}
-	query := "SELECT id, title, content, user_id, created_at FROM posts WHERE user_id = $1"
-	rows, err := s.db.Query(query, user_id)
+	offset := (page - 1) * size
+	query := "SELECT id, title, content, user_id, created_at FROM posts WHERE user_id = $1 ORDER BY " + sortBy + " " + sortOrder + " LIMIT $2 OFFSET $3"
+	rows, err := s.db.Query(query, user_id, size, offset)
 	if err != nil {
 		return nil, err
 	}

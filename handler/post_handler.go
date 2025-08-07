@@ -12,7 +12,20 @@ func (h *Handler) FindPosts(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
 	}
-	postList, err := h.postService.GetPosts(user_id)
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	size, err := strconv.Atoi(c.Query("size", "10"))
+	if err != nil || size < 1 {
+		size = 10
+	}
+	sortBy := c.Query("sort_by", "created_at")
+	sortOrder := c.Query("sort_order", "desc")
+	if sortBy != "created_at" || (sortOrder != "asc" && sortOrder != "desc") {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid sort parameters"})
+	}
+	postList, err := h.postService.GetPosts(user_id, page, size, sortBy, sortOrder)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
