@@ -3,13 +3,13 @@ package config
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
 func GetDbConnection() *sql.DB {
-	connStr := "postgres://postgres:mysecretpassword@localhost:5432/mt_test?sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open("postgres", os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		log.Fatal(err)
 	}
