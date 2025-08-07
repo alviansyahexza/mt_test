@@ -6,17 +6,18 @@ import (
 	"github.com/alviansyahexza/mt_test/config"
 	"github.com/alviansyahexza/mt_test/handler"
 	"github.com/gofiber/fiber/v2"
+	jwtware "github.com/gofiber/jwt/v3"
 	"github.com/redis/go-redis/v9"
+	"github.com/streadway/amqp"
 )
 
-func SetupFreeRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT) {
-	handler := handler.NewHandler(db, jwt, nil)
+func SetupRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT, redis *redis.Client, rabbit *amqp.Channel, jwtKey string) {
+	handler := handler.NewHandler(db, jwt, redis, rabbit)
 	app.Post("/users", handler.SignUp)
 	app.Post("/users/auth", handler.SignIn)
-}
-
-func SetupRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT, redis *redis.Client) {
-	handler := handler.NewHandler(db, jwt, redis)
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: []byte(jwtKey),
+	}))
 	app.Get("/posts", handler.FindPosts)
 	app.Post("/posts", handler.CreatePost)
 	app.Get("/posts/:id", handler.GetPostById)

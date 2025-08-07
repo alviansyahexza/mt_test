@@ -4,7 +4,6 @@ import (
 	"github.com/alviansyahexza/mt_test/config"
 	routes "github.com/alviansyahexza/mt_test/routes"
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v3"
 )
 
 func main() {
@@ -15,10 +14,12 @@ func main() {
 	app := fiber.New()
 	redis := config.GetRedisClient()
 	defer redis.Close()
-	routes.SetupFreeRoutes(app, db, jwt)
-	app.Use(jwtware.New(jwtware.Config{
-		SigningKey: []byte(jwtKey),
-	}))
-	routes.SetupRoutes(app, db, jwt, redis)
+	channel, err := config.GetRabbitClient()
+	if err != nil {
+		panic(err)
+	}
+	defer channel.Close()
+
+	routes.SetupRoutes(app, db, jwt, redis, channel, jwtKey)
 	app.Listen(":3000")
 }

@@ -38,7 +38,15 @@ func (h *Handler) FindPosts(c *fiber.Ctx) error {
 	if errCache != nil || len(idFromCache) == 0 {
 		postList, err = h.postService.GetPosts(user_id, page, size, sortBy, sortOrder, isFeed)
 		fmt.Println("Get post from database")
-		h.cachePost(c.Context(), postKey, user_id, size, sortBy, sortOrder, isFeed)
+		h.SendQueueJsonMessage(CACHE_POST_QUEUE, map[string]interface{}{
+			"post_key":   postKey,
+			"user_id":    user_id,
+			"size":       size,
+			"sort_by":    sortBy,
+			"sort_order": sortOrder,
+			"is_feed":    isFeed,
+		})
+		fmt.Println("Queued cache post: ", CACHE_POST_QUEUE)
 	} else {
 		postList, err = h.postService.GetPostByIds(idFromCache, sortBy, sortOrder)
 		fmt.Println("Get post from cache")
@@ -76,7 +84,7 @@ func (h *Handler) findPostInCache(
 	return paged, nil
 }
 
-func (h *Handler) cachePost(context context.Context, postKey string, userId int, size int, sortBy string, sortOrder string, isFeed bool) {
+func (h *Handler) CachePost(context context.Context, postKey string, userId int, size int, sortBy string, sortOrder string, isFeed bool) {
 	i, err := h.postService.GetPostIds(userId, 10, sortBy, sortOrder, isFeed)
 	if err != nil || len(i) == 0 {
 		fmt.Println("Failed to cache")
@@ -89,13 +97,11 @@ func (h *Handler) cachePost(context context.Context, postKey string, userId int,
 	}
 	idsString = idsString[:len(idsString)-1]
 	fmt.Println(idsString)
-	sc, errRedis := h.redis.Set(context, postKey, idsString, time.Minute).Result()
+	_, errRedis := h.redis.Set(context, postKey, idsString, time.Second*10).Result()
 	if errRedis != nil {
 		fmt.Println(errRedis.Error())
 	}
-	fmt.Println(sc)
 	fmt.Println("Done caching posts")
-	fmt.Println(h.redis.Get(context, postKey))
 }
 
 func (h *Handler) CreatePost(c *fiber.Ctx) error {
