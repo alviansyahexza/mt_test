@@ -9,6 +9,7 @@ import (
 	"github.com/alviansyahexza/mt_test/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/redis/go-redis/v9"
 )
 
 type Handler struct {
@@ -17,15 +18,17 @@ type Handler struct {
 	followService *service.FollowService
 	jwt           *config.JWT
 	db            *sql.DB
+	redis         *redis.Client
 }
 
-func NewHandler(db *sql.DB, jwt *config.JWT) *Handler {
+func NewHandler(db *sql.DB, jwt *config.JWT, redis *redis.Client) *Handler {
 	return &Handler{
 		userService:   service.NewUserService(repo.NewUserRepo(db)),
 		postService:   service.NewPostService(db),
 		followService: service.NewFollowService(db),
 		jwt:           jwt,
 		db:            db,
+		redis:         redis,
 	}
 }
 

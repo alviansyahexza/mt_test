@@ -6,16 +6,17 @@ import (
 	"github.com/alviansyahexza/mt_test/config"
 	"github.com/alviansyahexza/mt_test/handler"
 	"github.com/gofiber/fiber/v2"
+	"github.com/redis/go-redis/v9"
 )
 
 func SetupFreeRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT) {
-	handler := handler.NewHandler(db, jwt)
+	handler := handler.NewHandler(db, jwt, nil)
 	app.Post("/users", handler.SignUp)
 	app.Post("/users/auth", handler.SignIn)
 }
 
-func SetupRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT) {
-	handler := handler.NewHandler(db, jwt)
+func SetupRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT, redis *redis.Client) {
+	handler := handler.NewHandler(db, jwt, redis)
 	app.Get("/posts", handler.FindPosts)
 	app.Post("/posts", handler.CreatePost)
 	app.Get("/posts/:id", handler.GetPostById)

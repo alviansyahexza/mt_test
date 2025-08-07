@@ -8,15 +8,17 @@ import (
 )
 
 func main() {
-	db := config.GetConnection()
+	db := config.GetDbConnection()
 	defer db.Close()
 	jwtKey := "dummy_secret_key"
 	jwt := config.NewJWT(jwtKey)
 	app := fiber.New()
+	redis := config.GetRedisClient()
+	defer redis.Close()
 	routes.SetupFreeRoutes(app, db, jwt)
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(jwtKey),
 	}))
-	routes.SetupRoutes(app, db, jwt)
+	routes.SetupRoutes(app, db, jwt, redis)
 	app.Listen(":3000")
 }
