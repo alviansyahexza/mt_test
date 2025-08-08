@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -98,7 +99,13 @@ func (h *Handler) CachePost(context context.Context, postKey string, userId int,
 	}
 	idsString = idsString[:len(idsString)-1]
 	fmt.Println(idsString)
-	_, errRedis := h.redis.Set(context, postKey, idsString, time.Second*10).Result()
+	timeoutStr := os.Getenv("CACHE_POST_TIMEOUT_IN_MINUTES")
+	timeoutMinutes, err := strconv.Atoi(timeoutStr)
+	if err != nil || timeoutMinutes <= 0 {
+		timeoutMinutes = 10 // default to 10 minutes if not set or invalid
+	}
+	timeout := time.Duration(timeoutMinutes) * time.Minute
+	_, errRedis := h.redis.Set(context, postKey, idsString, timeout).Result()
 	if errRedis != nil {
 		fmt.Println(errRedis.Error())
 	}

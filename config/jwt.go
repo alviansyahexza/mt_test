@@ -2,6 +2,8 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -16,11 +18,17 @@ func NewJWT(secret string) *JWT {
 		key: []byte(secret),
 	}
 }
-
 func (j *JWT) GenerateToken(userId int) (string, error) {
+	timeoutStr := os.Getenv("JWT_AUTH_TIMEOUT_IN_HOURS")
+	timeoutHours := 1
+	if timeoutStr != "" {
+		if t, err := strconv.Atoi(timeoutStr); err == nil {
+			timeoutHours = t
+		}
+	}
 	claims := jwt.MapClaims{
 		"user_id": userId,
-		"exp":     jwt.NewNumericDate(time.Now().Add(time.Minute * 10)),
+		"exp":     jwt.NewNumericDate(time.Now().Add(time.Duration(timeoutHours) * time.Hour)),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(j.key)
