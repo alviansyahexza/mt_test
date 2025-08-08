@@ -61,3 +61,15 @@ func (s *UserService) UpdateProfile(user *entity.User) (*entity.User, error) {
 	}
 	return u, nil
 }
+
+func (s *UserService) GetProfile(userId int) (*entity.User, error) {
+	if userId <= 0 {
+		return nil, errors.New("invalid user ID")
+	}
+	user, err := s.userRepo.GetUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = ""
+	return user, nil
+}

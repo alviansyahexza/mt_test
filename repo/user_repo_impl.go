@@ -42,3 +42,13 @@ func (r *userRepoImpl) UpdateUser(user *entity.User) (*entity.User, error) {
 	}
 	return user, nil
 }
+
+func (r *userRepoImpl) GetUserById(id int) (*entity.User, error) {
+	query := "SELECT id, name, email, password FROM users WHERE id = $1"
+	user := &entity.User{}
+	err := r.db.QueryRow(query, id).Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

@@ -29,3 +29,11 @@ func (m *UserRepoMock) UpdateUser(user *entity.User) (*entity.User, error) {
 	}
 	return nil, args.Error(1)
 }
+
+func (m *UserRepoMock) GetUserById(id int) (*entity.User, error) {
+	args := m.Called(id)
+	if user, ok := args.Get(0).(*entity.User); ok {
+		return user, args.Error(1)
+	}
+	return nil, args.Error(1)
+}

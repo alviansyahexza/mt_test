@@ -49,3 +49,15 @@ func (h *Handler) UpdateUser(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(u)
 }
+
+func (h *Handler) GetProfile(c *fiber.Ctx) error {
+	userId, err := h.GetUserIdFromToken(c)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
+	u, err2 := h.userService.GetProfile(userId)
+	if err2 != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err2.Error()})
+	}
+	return c.Status(fiber.StatusOK).JSON(u)
+}

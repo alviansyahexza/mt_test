@@ -18,6 +18,7 @@ func SetupRoutes(app *fiber.App, db *sql.DB, jwt *config.JWT, redis *redis.Clien
 	app.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(jwtKey),
 	}))
+	app.Get("/users", handler.GetProfile)
 	app.Get("/posts", handler.FindPosts)
 	app.Post("/posts", handler.CreatePost)
 	app.Get("/posts/:id", handler.GetPostById)

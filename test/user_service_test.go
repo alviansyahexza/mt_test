@@ -11,10 +11,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var userRepoMock = &UserRepoMock{Mock: mock.Mock{}}
-var userService = service.NewUserService(userRepoMock)
-
 func TestUserServiceSignUp(t *testing.T) {
+	var userRepoMock = &UserRepoMock{Mock: mock.Mock{}}
+	var userService = service.NewUserService(userRepoMock)
 	mockedUser := &entity.User{
 		Id:       1,
 		Name:     "John Doe",
@@ -45,6 +44,8 @@ func TestUserServiceSignUp(t *testing.T) {
 }
 
 func TestUserServiceSignIn(t *testing.T) {
+	var userRepoMock = &UserRepoMock{Mock: mock.Mock{}}
+	var userService = service.NewUserService(userRepoMock)
 	mockedPassword := "password123"
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(mockedPassword), bcrypt.DefaultCost)
 	mockedUser := &entity.User{
@@ -72,6 +73,8 @@ func TestUserServiceSignIn(t *testing.T) {
 }
 
 func TestUserServiceUpdateProfile(t *testing.T) {
+	var userRepoMock = &UserRepoMock{Mock: mock.Mock{}}
+	var userService = service.NewUserService(userRepoMock)
 	mockedUser := &entity.User{
 		Id:       1,
 		Name:     "John Doe",
@@ -97,4 +100,38 @@ func TestUserServiceUpdateProfile(t *testing.T) {
 	assert.Nil(t, failedUpdatedUser)
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid data to update: name and id are required", err.Error())
+}
+
+func TestUserServiceGetProfile(t *testing.T) {
+	var userRepoMock = &UserRepoMock{Mock: mock.Mock{}}
+	var userService = service.NewUserService(userRepoMock)
+	mockedUser := &entity.User{
+		Id:       1,
+		Name:     "John Doe",
+		Email:    "john@example.com",
+		Password: "password123",
+	}
+
+	userRepoMock.On("GetUserById", mockedUser.Id).Return(mockedUser, nil)
+	userResult, err := userService.GetProfile(mockedUser.Id)
+
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	assert.Equal(t, mockedUser.Id, userResult.Id)
+	assert.Equal(t, mockedUser.Name, userResult.Name)
+	assert.Equal(t, mockedUser.Email, userResult.Email)
+	assert.Equal(t, "", userResult.Password)
+
+	invalidUserId := 0
+	_, err = userService.GetProfile(invalidUserId)
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid user ID", err.Error())
+
+	userRepoMock.On("GetUserById", invalidUserId).Unset()
+	userRepoMock.On("GetUserById", invalidUserId).Return(nil, errors.New("user not found"))
+	_, err = userService.GetProfile(invalidUserId)
+	assert.NotNil(t, err)
+	assert.Equal(t, "invalid user ID", err.Error())
 }
