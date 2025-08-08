@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: golang_app
+    env_file:
+      - .env.dev.deploy
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:15
+    container_name: mt_test_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: mt_test
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/create-mt-test.sh:/docker-entrypoint-initdb.d/create-mt-test.sh:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  redis:
+    image: redis:7
+    container_name: mt_test_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: mt_test_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
