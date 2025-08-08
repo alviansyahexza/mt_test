@@ -45,6 +45,7 @@ func (h *Handler) FindPosts(c *fiber.Ctx) error {
 			"sort_by":    sortBy,
 			"sort_order": sortOrder,
 			"is_feed":    isFeed,
+			"page":       page,
 		})
 		fmt.Println("Queued cache post: ", CACHE_POST_QUEUE)
 	} else {
@@ -84,8 +85,8 @@ func (h *Handler) findPostInCache(
 	return paged, nil
 }
 
-func (h *Handler) CachePost(context context.Context, postKey string, userId int, size int, sortBy string, sortOrder string, isFeed bool) {
-	i, err := h.postService.GetPostIds(userId, 10, sortBy, sortOrder, isFeed)
+func (h *Handler) CachePost(context context.Context, postKey string, userId int, page int, size int, sortBy string, sortOrder string, isFeed bool) {
+	i, err := h.postService.GetPostIds(userId, page*size*3, sortBy, sortOrder, isFeed)
 	if err != nil || len(i) == 0 {
 		fmt.Println("Failed to cache")
 		return

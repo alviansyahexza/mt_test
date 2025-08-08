@@ -117,6 +117,11 @@ func consume(channel *amqp.Channel, handler *Handler) {
 			fmt.Println("size is not a float64")
 			continue
 		}
+		page, ok := message["page"].(float64)
+		if !ok {
+			fmt.Println("page is not a float64")
+			continue
+		}
 		sortBy, ok := message["sort_by"].(string)
 		if !ok {
 			fmt.Println("sort_by is not a string")
@@ -133,7 +138,7 @@ func consume(channel *amqp.Channel, handler *Handler) {
 			continue
 		}
 
-		handler.CachePost(context.Background(), postKey, int(userId), int(size), sortBy, sortOrder, isFeed)
+		handler.CachePost(context.Background(), postKey, int(userId), int(page), int(size), sortBy, sortOrder, isFeed)
 	}
 }
 
