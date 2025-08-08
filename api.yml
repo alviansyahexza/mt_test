@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  title: mt_test
+  version: 1.0.0
+  description: ""
+servers:
+  - url: "{{local}}"
+paths:
+  /users:
+    parameters: []
+    post:
+      summary: signUp
+      parameters: []
+      responses:
+        "201":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:18:27 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "129"
+          description: signUp
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  password:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+    put:
+      summary: updateProfile
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:20:31 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "137"
+          description: updateProfile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  password:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+  /users/auth:
+    parameters: []
+    post:
+      summary: signIn
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:19:03 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: text/plain; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+              example: "123"
+          description: signIn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+  /posts:
+    parameters: []
+    get:
+      summary: feed
+      parameters:
+        - name: page
+          in: query
+          required: false
+          example: "1"
+          schema:
+            type: integer
+        - name: sort_order
+          in: query
+          required: false
+          example: asc
+          schema:
+            type: string
+        - name: size
+          in: query
+          required: false
+          example: "10"
+          schema:
+            type: integer
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 01:23:41 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "1367"
+          description: feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    content:
+                      type: string
+                    user_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+    post:
+      summary: createPost
+      parameters: []
+      responses:
+        "201":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:21:26 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "165"
+          description: createPost
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  user_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+  /posts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        example: "29"
+        schema:
+          type: integer
+    get:
+      summary: detailPost
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:21:58 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "172"
+          description: detailPost
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  user_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+    put:
+      summary: updatePost
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:22:49 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "181"
+          description: updatePost
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  user_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+    delete:
+      summary: deletePost
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:23:11 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: text/plain; charset=utf-8
+            Content-Length:
+              schema:
+                type: integer
+              example: "12"
+          description: deletePost
+  /follows:
+    parameters: []
+    post:
+      summary: follow
+      parameters: []
+      responses:
+        "201":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:24:10 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "90"
+          description: follow
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  follower_id:
+                    type: integer
+                  followed_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followed_id:
+                  type: integer
+  /follows/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        example: "12"
+        schema:
+          type: integer
+    delete:
+      summary: unfollow
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 06:24:34 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "41"
+          description: unfollow
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    format: style
