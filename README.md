@@ -38,13 +38,6 @@ docker-compose up --build
 - Redis → localhost:6379
 - RabbitMQ UI → http://localhost:15672 (user: user, pass: password)
 
-## 🌍 Access Points
-
-- API → http://localhost:3000
-- PostgreSQL → localhost:5432 (user: postgres, pass: mysecretpassword)
-- Redis → localhost:6379
-- RabbitMQ UI → http://localhost:15672 (user: user, pass: password)
-
 ## 📝 Notes
 
 1. This API is using full Dockerized system, if you have your own PostgreSQL, Redis and RabbitMQ you can adjust Dockerfile to point on your system
