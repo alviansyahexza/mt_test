@@ -101,6 +101,42 @@ paths:
               properties:
                 name:
                   type: string
+    get:
+      summary: getProfile
+      parameters: []
+      responses:
+        "200":
+          headers:
+            Date:
+              schema:
+                type: string
+              example: Fri, 08 Aug 2025 09:12:23 GMT
+            Content-Type:
+              schema:
+                type: string
+              example: application/json
+            Content-Length:
+              schema:
+                type: integer
+              example: "128"
+          description: getProfile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  email:
+                    type: string
+                    format: email
+                  password:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
   /users/auth:
     parameters: []
     post:
