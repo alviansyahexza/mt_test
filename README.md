@@ -1,5 +1,9 @@
 # Golang REST API with PostgreSQL, Redis, and RabbitMQ
 
+## 📝 Notes Prepare
+
+Make sure git, docker and docker compose is already installed on your system to run this project
+
 ## 📦 Stack
 
 - Go
