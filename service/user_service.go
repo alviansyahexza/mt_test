@@ -17,6 +17,10 @@ func NewUserService(userRepo repo.UserRepo) *UserService {
 }
 
 func (s *UserService) SignUp(name, email, password string) (*entity.User, error) {
+	_, err := s.userRepo.GetUserByEmail(email)
+	if err == nil {
+		return nil, errors.New("user already exists with this email")
+	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err

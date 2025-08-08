@@ -1,6 +1,7 @@
 package test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/alviansyahexza/mt_test/entity"
@@ -21,6 +22,8 @@ func TestUserServiceSignUp(t *testing.T) {
 		Password: "password123",
 	}
 
+	userRepoMock.On("GetUserByEmail", mockedUser.Email).Return(nil, errors.New("user not found"))
+
 	userRepoMock.On("CreateUser", mockedUser.Name, mockedUser.Email, mock.AnythingOfType("string")).Return(int64(mockedUser.Id), nil)
 
 	userResult, err := userService.SignUp(mockedUser.Name, mockedUser.Email, mockedUser.Password)
@@ -32,6 +35,13 @@ func TestUserServiceSignUp(t *testing.T) {
 	assert.Equal(t, mockedUser.Id, userResult.Id)
 	assert.Equal(t, mockedUser.Email, userResult.Email)
 	assert.Equal(t, "", userResult.Password)
+
+	userRepoMock.On("GetUserByEmail", mockedUser.Email).Unset()
+	userRepoMock.On("GetUserByEmail", mockedUser.Email).Return(mockedUser, nil)
+	userResult2, err2 := userService.SignUp(mockedUser.Name, mockedUser.Email, mockedUser.Password)
+	assert.Nil(t, userResult2)
+	assert.NotNil(t, err2)
+	assert.Equal(t, "user already exists with this email", err2.Error())
 }
 
 func TestUserServiceSignIn(t *testing.T) {
